@@ -1,0 +1,63 @@
+<h1>Add New Product</h1>
+<form th:action="@{/admin/products}" th:object="${product}" method="post" enctype="multipart/form-data">
+    <label>Name:</label>
+    <input type="text" th:field="*{name}" required/>
+    <br/>
+    <label>Price:</label>
+    <input type="number" th:field="*{price}" required/>
+    <br/>
+    <label>Qty:</label>
+    <input type="number" th:field="*{qty}" required/>
+    <br>
+    <label>Description:</label>
+    <textarea th:field="*{description}"></textarea>
+    <br/>
+
+    <!-- Hình ảnh -->
+    <label>Images:</label>
+    <input type="file" name="images" multiple/>
+    <br/>
+    
+    <button type="submit">Save</button>
+</form>
+
+
+<style>
+
+    label {
+        display: block; /* Hiển thị label trên một dòng mới */
+        margin-bottom: 5px; /* Đệm dưới cho label */
+        font-weight: bold; /* Đậm cho label */
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    input[type="file"] {
+        width: 100%; /* Độ rộng 100% cho các trường nhập */
+        padding: 10px; /* Thêm padding cho trường nhập */
+        margin-bottom: 15px; /* Đệm dưới cho trường nhập */
+        border: 1px solid #ccc; /* Đường viền cho trường nhập */
+        border-radius: 4px; /* Bo góc cho trường nhập */
+        box-sizing: border-box; /* Bao gồm padding và border trong kích thước */
+    }
+
+    input[type="file"] {
+        padding: 3px; /* Padding nhỏ hơn cho input file */
+    }
+
+    button[type="submit"] {
+        background-color: #3498db; /* Màu nền cho nút */
+        color: white; /* Màu chữ cho nút */
+        padding: 10px 20px; /* Padding cho nút */
+        border: none; /* Bỏ viền cho nút */
+        border-radius: 5px; /* Bo góc cho nút */
+        cursor: pointer; /* Con trỏ khi hover */
+        font-size: 16px; /* Kích thước chữ cho nút */
+        transition: background-color 0.3s ease; /* Hiệu ứng chuyển đổi màu nền */
+    }
+
+    button[type="submit"]:hover {
+        background-color: #2980b9; /* Màu khi hover */
+    }
+</style>
