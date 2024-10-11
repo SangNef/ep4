@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Product</title>
+    <link rel="stylesheet" href="/assets/css/admin.css">
+    <script>
+        function addColorInput() {
+            const colorContainer = document.getElementById('color-container');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'colors';
+            input.placeholder = 'Enter color';
+            colorContainer.appendChild(input);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Admin Menu</h2>
+            <ul>
+                <li><a href="/admin/product">Products</a></li>
+                <li><a href="/admin/orders">Orders</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/vouchers">Vouchers</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h1>Create Product</h1>
+            <form action="/admin/product/create" method="POST" enctype="multipart/form-data">
+                <div>
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div>
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" rows="10" required></textarea>
+                </div>
+                <div>
+                    <label for="price">Price:</label>
+                    <input type="number" id="price" name="price" required>
+                </div>
+                <div>
+                    <label for="qty">Quantity:</label>
+                    <input type="number" id="qty" name="qty" required>
+                </div>
+                <div>
+                    <label for="category">Category:</label>
+                    <select id="category" name="category" required>
+                        <option value="1">Category 1</option>
+                        <option value="2">Category 2</option>
+                        <option value="3">Category 3</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="image">Product Images:</label>
+                    <input type="file" id="image" name="image" accept="image/*" required>
+                </div>
+                <button type="submit">Create Product</button>
+            </form>
+        </main>
+    </div>
+</body>
+</html>

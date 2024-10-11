@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Admin Menu</h2>
+            
+            <ul>
+                <li><a href="/admin/product">Products</a></li>
+                <li><a href="/admin/orders">Orders</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/vouchers">Vouchers</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h1>Danh sách sản phẩm</h1>
+            <a th:href="@{/admin/product/create}" class="btn">Create New Product</a>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tên sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Mô tả</th>
+                        <th>Số lượng</th>
+                        <th>Hình ảnh</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="product : ${products}">
+                        <td th:text="${product.name}">Tên sản phẩm</td>
+                        <td th:text="${product.price}">Giá</td>
+                        <td th:text="${product.description}">Mô tả</td>
+                        <td th:text="${product.qty}">Số lượng</td>
+                        <td>
+                            <img th:src="@{${product.image}}" alt="Product Image" style="width:100px;">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+</body>
+</html>

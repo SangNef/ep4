@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voucher List</title>
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Admin Menu</h2>
+            
+            <ul>
+                <li><a href="/admin/product">Products</a></li>
+                <li><a href="/admin/orders">Orders</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/vouchers">Vouchers</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h1>Voucher List</h1>
+            <a href="/admin/voucher/create">Create New Voucher</a>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Code</th>
+                        <th>Discount</th>
+                        <th>Quantity</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="voucher : ${vouchers}">
+                        <td th:text="${voucher.id}"></td>
+                        <td th:text="${voucher.code}"></td>
+                        <td th:text="${voucher.discount}"></td>
+                        <td th:text="${voucher.qty}"></td>
+                        <td th:text="${voucher.description}"></td>
+                        <td>
+                            <a th:href="@{/admin/voucher/edit/{id}(id=${voucher.id})}">Edit</a>
+                            <a th:href="@{/admin/voucher/delete/{id}(id=${voucher.id})}">Delete</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+</body>
+</html>

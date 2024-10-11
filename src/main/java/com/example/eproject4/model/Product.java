@@ -2,7 +2,6 @@ package com.example.eproject4.model;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -13,12 +12,13 @@ public class Product {
 
     private String name;
     private Double price;
-    private String description;
-    private Integer qty;
-    private Timestamp deletedAt;
 
-    @OneToMany(mappedBy = "product")
-    private List<ProductImage> images;
+    @Column(columnDefinition = "TEXT")
+    private String description;
+    private String category;
+    private Integer qty;
+    private String image;
+    private Timestamp deletedAt;
 
     // Getters and Setters
     public Integer getId() {
@@ -53,6 +53,14 @@ public class Product {
         this.description = description;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public Integer getQty() {
         return qty;
     }
@@ -69,11 +77,11 @@ public class Product {
         this.deletedAt = deletedAt;
     }
 
-    public List<ProductImage> getImages() {
-        return images;
+    public String getImage() {
+        return image;
     }
 
-    public void setImages(List<ProductImage> images) {
-        this.images = images;
+    public void setImage(String image) {
+        this.image = image;
     }
 }
