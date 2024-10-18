@@ -1,29 +1,38 @@
-package com.example.eproject4.model;
+package com.example.eproject4.dto;
 
-import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 
-@Entity
-@Table(name = "products")
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ProductDTO {
+
     private Integer id;
 
+    @NotBlank(message = "Name is required")
     private String name;
+
+    @NotNull(message = "Price is required")
     private Integer price;
 
-    @Column(columnDefinition = "TEXT")
+    @NotBlank(message = "Description is required")
     private String description;
+
     private String category;
+
+    @NotNull(message = "Quantity is required")
     private Integer qty;
+
+    @NotNull(message = "Status is required")
     private Boolean status;
+
+    @NotNull(message = "Can rent field is required")
     private Boolean canRent;
+
     private Integer rentPrice;
+
+    private List<String> images; // Hoặc List<MultipartFile> nếu bạn muốn truyền file hình ảnh
 
     // Getters and Setters
 
@@ -99,15 +108,11 @@ public class Product {
         this.rentPrice = rentPrice;
     }
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductImage> productImages = new ArrayList<>();
-
-    public List<ProductImage> getProductImages() {
-        return productImages;
+    public List<String> getImages() {
+        return images;
     }
 
-    public void setProductImages(List<ProductImage> productImages) {
-        this.productImages = productImages;
+    public void setImages(List<String> images) {
+        this.images = images;
     }
-
 }
