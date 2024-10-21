@@ -1,11 +1,6 @@
 package com.example.eproject4.model;
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -24,6 +19,7 @@ public class Product {
     private Boolean status;
     private Boolean canRent;
     private Integer rentPrice;
+    private String image;
 
     // Getters and Setters
 
@@ -99,15 +95,12 @@ public class Product {
         this.rentPrice = rentPrice;
     }
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductImage> productImages = new ArrayList<>();
-
-    public List<ProductImage> getProductImages() {
-        return productImages;
+    public String getImage() {
+        return image;
     }
 
-    public void setProductImages(List<ProductImage> productImages) {
-        this.productImages = productImages;
+    public void setImage(String image) {
+        this.image = image;
     }
 
 }
