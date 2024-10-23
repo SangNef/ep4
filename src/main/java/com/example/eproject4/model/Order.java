@@ -18,6 +18,10 @@ public class Order {
     private Product product;
 
     @ManyToOne
+    @JoinColumn(name = "ward_id", nullable = false) // Thêm quan hệ tới Ward
+    private Ward ward;
+
+    @ManyToOne
     @JoinColumn(name = "voucher_id")
     private Voucher voucher;
 
@@ -30,6 +34,9 @@ public class Order {
     private String phone;
     private String address;
 
+    @Column(columnDefinition = "TINYINT DEFAULT 0", nullable = false)
+    private int status = 0; // Default value
+
     public Order() {}
 
     // Getters and Setters
@@ -41,6 +48,9 @@ public class Order {
 
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }
+
+    public Ward getWard() { return ward; }
+    public void setWard(Ward ward) { this.ward = ward; }
 
     public Voucher getVoucher() { return voucher; }
     public void setVoucher(Voucher voucher) { this.voucher = voucher; }
@@ -59,6 +69,9 @@ public class Order {
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+
+    public int getStatus() { return status; }
+    public void setStatus(int status) { this.status = status; }
 
     public enum Payment {
         CASH,

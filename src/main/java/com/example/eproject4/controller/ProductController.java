@@ -42,6 +42,17 @@ public class ProductController {
         }
     }
 
+    // Update product by ID
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable int id, @RequestBody Product updatedProduct) {
+        Product product = productService.updateProduct(id, updatedProduct);
+        if (product != null) {
+            return ResponseEntity.ok(product);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
     // 5. Delete Product
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable int id) {
@@ -51,5 +62,36 @@ public class ProductController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/random")
+    public ResponseEntity<List<Product>> getRandomProducts() {
+        List<Product> randomProducts = productService.getRandomProducts(4);
+        return ResponseEntity.ok(randomProducts);
+    }
+
+    @GetMapping("/category/fruit-tree")
+    public ResponseEntity<List<Product>> getFruitTrees() {
+        return ResponseEntity.ok(productService.getFruitTrees());
+    }
+
+    @GetMapping("/category/flowering-tree")
+    public ResponseEntity<List<Product>> getFloweringTrees() {
+        return ResponseEntity.ok(productService.getFloweringTrees());
+    }
+
+    @GetMapping("/category/shade-tree")
+    public ResponseEntity<List<Product>> getShadeTrees() {
+        return ResponseEntity.ok(productService.getShadeTrees());
+    }
+
+    @GetMapping("/category/ornamental-tree")
+    public ResponseEntity<List<Product>> getOrnamentalTrees() {
+        return ResponseEntity.ok(productService.getOrnamentalTrees());
+    }
+
+    @GetMapping("/category/evergreen-tree")
+    public ResponseEntity<List<Product>> getEvergreenTrees() {
+        return ResponseEntity.ok(productService.getEvergreenTrees());
     }
 }
