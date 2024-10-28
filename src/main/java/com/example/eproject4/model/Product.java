@@ -1,6 +1,7 @@
 package com.example.eproject4.model;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -19,7 +20,11 @@ public class Product {
     private Boolean status;
     private Boolean canRent;
     private Integer rentPrice;
-    private String image;
+
+    @ElementCollection
+    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "image")
+    private List<String> images;
 
     // Getters and Setters
 
@@ -95,12 +100,11 @@ public class Product {
         this.rentPrice = rentPrice;
     }
 
-    public String getImage() {
-        return image;
+    public List<String> getImages() {
+        return images;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImages(List<String> images) {
+        this.images = images;
     }
-
 }

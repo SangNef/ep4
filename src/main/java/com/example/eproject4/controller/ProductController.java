@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/products")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -51,6 +52,12 @@ public class ProductController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+    }
+
+    @PutMapping("/status/{id}")
+    public ResponseEntity<Product> updateProductStatus(@PathVariable Integer id) {
+        Product updatedProduct = productService.toggleProductStatus(id);
+        return ResponseEntity.ok(updatedProduct);
     }
 
     // 5. Delete Product

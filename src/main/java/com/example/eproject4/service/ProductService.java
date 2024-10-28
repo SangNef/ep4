@@ -38,7 +38,21 @@ public class ProductService {
         existingProduct.setDescription(updatedProduct.getDescription());
         existingProduct.setPrice(updatedProduct.getPrice());
         existingProduct.setCategory(updatedProduct.getCategory());
+        existingProduct.setQty(updatedProduct.getQty());
+        existingProduct.setCanRent(updatedProduct.getCanRent());
+        existingProduct.setRentPrice(updatedProduct.getRentPrice());
 
+        existingProduct.setImages(updatedProduct.getImages());
+
+        return productRepository.save(existingProduct); // Save the updated product
+    }
+
+    public Product toggleProductStatus(Integer id) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        // Toggle the status
+        existingProduct.setStatus(!existingProduct.getStatus());
         return productRepository.save(existingProduct); // Save the updated product
     }
 

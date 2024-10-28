@@ -25,6 +25,13 @@ public class Order {
     @JoinColumn(name = "voucher_id")
     private Voucher voucher;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderType type; // Type of order: buy or rent
+
+    @Column(nullable = true)
+    private int rentDay; // Number of days for renting
+
     private int qty;
     private int price;
 
@@ -55,6 +62,12 @@ public class Order {
     public Voucher getVoucher() { return voucher; }
     public void setVoucher(Voucher voucher) { this.voucher = voucher; }
 
+    public OrderType getType() { return type; }
+    public void setType(OrderType type) { this.type = type; }
+
+    public int getRentDay() { return rentDay; }
+    public void setRentDay(int rentDay) { this.rentDay = rentDay; }
+
     public int getQty() { return qty; }
     public void setQty(int qty) { this.qty = qty; }
 
@@ -76,5 +89,10 @@ public class Order {
     public enum Payment {
         CASH,
         PAY
+    }
+
+    public enum OrderType { // New enum for order type
+        BUY,
+        RENT
     }
 }

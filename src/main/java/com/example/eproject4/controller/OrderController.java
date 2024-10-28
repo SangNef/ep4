@@ -16,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/orders")
@@ -66,5 +69,42 @@ public class OrderController {
     public ResponseEntity<List<WardDTO>> getWardsByDistrict(@PathVariable int districtId) {
         List<WardDTO> wards = wardService.getWardsByDistrict(districtId);
         return ResponseEntity.ok(wards);
+    }
+
+    // Endpoint to get order by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Order> getOrderById(@PathVariable int id) {
+        Order order = orderService.getOrderById(id);
+        if (order != null) {
+            return ResponseEntity.ok(order);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/update-status/{id}")
+    public ResponseEntity<Order> updateOrderStatus(@PathVariable int id) {
+        Order updatedOrder = orderService.updateOrderStatus(id);
+        if (updatedOrder != null) {
+            return ResponseEntity.ok(updatedOrder);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<Order> cancelOrder(@PathVariable int id) {
+        Order updatedOrder = orderService.cancelOrder(id);
+        if (updatedOrder != null) {
+            return ResponseEntity.ok(updatedOrder);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Order>> getOrderByUserId(@PathVariable int userId) {
+        List<Order> orders = orderService.getOrderByUserId(userId);
+        return ResponseEntity.ok(orders);
     }
 }
