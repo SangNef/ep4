@@ -11,4 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findByCategory(String category);
+    List<Product> findByStatus(boolean status);
+    List<Product> findByCategoryAndStatus(String category, boolean status);
 }

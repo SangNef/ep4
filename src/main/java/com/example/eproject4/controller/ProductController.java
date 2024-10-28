@@ -26,6 +26,12 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @GetMapping("/active")
+    public ResponseEntity<List<Product>> getAllActiveProducts() {
+        List<Product> products = productService.getAllActiveProducts();
+        return ResponseEntity.ok(products);
+    }
+
     @PostMapping("/create")
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         Product createdProduct = productService.createProduct(product);

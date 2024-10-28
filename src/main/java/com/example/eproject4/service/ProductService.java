@@ -26,6 +26,10 @@ public class ProductService {
         return productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")); // Sort by createdDate in descending order
     }
 
+    public List<Product> getAllActiveProducts() {
+        return productRepository.findByStatus(true);
+    }
+
     public Product getProductById(int id) {
         return productRepository.findById(id).orElse(null);
     }
@@ -78,7 +82,7 @@ public class ProductService {
     }
 
     public List<Product> getProductsByCategory(String category) {
-        return productRepository.findByCategory(category);
+        return productRepository.findByCategoryAndStatus(category, true);
     }
 
     public List<Product> getFruitTrees() {
@@ -100,4 +104,5 @@ public class ProductService {
     public List<Product> getEvergreenTrees() {
         return getProductsByCategory("Evergreen Tree");
     }
+
 }
