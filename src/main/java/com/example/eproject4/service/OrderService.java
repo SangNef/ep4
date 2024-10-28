@@ -2,10 +2,13 @@ package com.example.eproject4.service;
 
 import com.example.eproject4.model.Order;
 import com.example.eproject4.repository.OrderRepository;
+
+import org.hibernate.engine.internal.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class OrderService {
@@ -20,7 +23,7 @@ public class OrderService {
 
     // Get a list of all orders
     public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     // Get an order by ID

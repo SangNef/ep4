@@ -3,6 +3,7 @@ package com.example.eproject4.service;
 import com.example.eproject4.model.Product;
 import com.example.eproject4.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +23,7 @@ public class ProductService {
     }
 
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")); // Sort by createdDate in descending order
     }
 
     public Product getProductById(int id) {
