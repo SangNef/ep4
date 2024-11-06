@@ -15,7 +15,7 @@ public class Order {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "ward_id", nullable = false)
+    @JoinColumn(name = "ward_id", nullable = true)
     private Ward ward;
 
     @ManyToOne
@@ -35,7 +35,9 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private Payment payment;
 
+    @Column(nullable = true)
     private String phone;
+    @Column(nullable = true)
     private String address;
 
     @Column(columnDefinition = "TINYINT DEFAULT 0", nullable = false)
