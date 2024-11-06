@@ -1,6 +1,7 @@
 package com.example.eproject4.model;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "Orders")
@@ -14,11 +15,7 @@ public class Order {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
-
-    @ManyToOne
-    @JoinColumn(name = "ward_id", nullable = false) // Thêm quan hệ tới Ward
+    @JoinColumn(name = "ward_id", nullable = false)
     private Ward ward;
 
     @ManyToOne
@@ -32,8 +29,8 @@ public class Order {
     @Column(nullable = true)
     private int rentDay; // Number of days for renting
 
-    private int qty;
-    private int price;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderDetail> orderDetails; // One-to-many relationship with OrderDetail
 
     @Enumerated(EnumType.STRING)
     private Payment payment;
@@ -44,6 +41,8 @@ public class Order {
     @Column(columnDefinition = "TINYINT DEFAULT 0", nullable = false)
     private int status = 0; // Default value
 
+    private int price; // Added price field
+
     public Order() {}
 
     // Getters and Setters
@@ -52,9 +51,6 @@ public class Order {
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
-
-    public Product getProduct() { return product; }
-    public void setProduct(Product product) { this.product = product; }
 
     public Ward getWard() { return ward; }
     public void setWard(Ward ward) { this.ward = ward; }
@@ -68,11 +64,8 @@ public class Order {
     public int getRentDay() { return rentDay; }
     public void setRentDay(int rentDay) { this.rentDay = rentDay; }
 
-    public int getQty() { return qty; }
-    public void setQty(int qty) { this.qty = qty; }
-
-    public int getPrice() { return price; }
-    public void setPrice(int price) { this.price = price; }
+    public List<OrderDetail> getOrderDetails() { return orderDetails; }
+    public void setOrderDetails(List<OrderDetail> orderDetails) { this.orderDetails = orderDetails; }
 
     public Payment getPayment() { return payment; }
     public void setPayment(Payment payment) { this.payment = payment; }
@@ -86,12 +79,15 @@ public class Order {
     public int getStatus() { return status; }
     public void setStatus(int status) { this.status = status; }
 
+    public int getPrice() { return price; }  // Getter for price
+    public void setPrice(int price) { this.price = price; }  // Setter for price
+
     public enum Payment {
         CASH,
         PAY
     }
 
-    public enum OrderType { // New enum for order type
+    public enum OrderType {
         BUY,
         RENT
     }

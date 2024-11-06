@@ -1,6 +1,7 @@
 package com.example.eproject4.controller;
 
 import com.example.eproject4.model.Order;
+import com.example.eproject4.model.OrderDetail;
 import com.example.eproject4.model.Province;
 import com.example.eproject4.dto.DistrictDTO;
 import com.example.eproject4.dto.ProvinceDTO;
@@ -16,9 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @RestController
 @RequestMapping("/api/orders")
@@ -39,7 +37,14 @@ public class OrderController {
     // Endpoint to create a new order
     @PostMapping
     public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+        // Ensure that the order details are properly linked to the order
+        for (OrderDetail orderDetail : order.getOrderDetails()) {
+            orderDetail.setOrder(order); // Link the order detail to the order
+        }
+
+        // Create the order using the service
         Order createdOrder = orderService.createOrder(order);
+
         return ResponseEntity.ok(createdOrder);
     }
 
