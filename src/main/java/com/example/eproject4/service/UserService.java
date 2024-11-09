@@ -40,5 +40,34 @@ public class UserService {
         }
         return Optional.empty();
     }
+
+    public User updateProfile(User updatedUser, int userId) {
+        Optional<User> existingUser = userRepository.findById(userId);
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            // Update only username and fullname
+            user.setUsername(updatedUser.getUsername());
+            user.setFullname(updatedUser.getFullname());
+            return userRepository.save(user);
+        } else {
+            throw new IllegalArgumentException("User not found.");
+        }
+    }
+
+    public User updatePassword(int userId, String oldPassword, String newPassword) {
+        Optional<User> existingUser = userRepository.findById(userId);
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            // Check if the old password matches
+            if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+                throw new IllegalArgumentException("Incorrect old password.");
+            }
+            // Update the password
+            user.setPassword(passwordEncoder.encode(newPassword));
+            return userRepository.save(user);
+        } else {
+            throw new IllegalArgumentException("User not found.");
+        }
+    }
 }
 

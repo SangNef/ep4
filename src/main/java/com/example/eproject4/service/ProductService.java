@@ -1,5 +1,6 @@
 package com.example.eproject4.service;
 
+import com.example.eproject4.dto.ProductDTO;
 import com.example.eproject4.model.Product;
 import com.example.eproject4.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,4 +106,18 @@ public class ProductService {
         return getProductsByCategory("Evergreen Tree");
     }
 
+    public ProductDTO convertToDTO(Product product) {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(product.getId());
+        productDTO.setName(product.getName());
+        productDTO.setPrice(product.getPrice());
+        productDTO.setDescription(product.getDescription());
+        productDTO.setCategory(product.getCategory());
+        productDTO.setQty(product.getQty());
+        productDTO.setStatus(product.getStatus());
+        productDTO.setCanRent(product.getCanRent());
+        productDTO.setRentPrice(product.getRentPrice());
+        productDTO.setImages(product.getImages());
+        return productDTO;
+    }
 }

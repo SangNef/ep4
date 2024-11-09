@@ -43,4 +43,31 @@ public class AuthController {
         return ResponseEntity.status(401).body("Invalid credentials");
     }
 
+    @PutMapping("/edit-profile")
+    public ResponseEntity<?> updateProfile(@RequestBody User updatedUser, @RequestParam("userId") int userId) {
+        try {
+            User user = userService.updateProfile(updatedUser, userId);
+            user.setPassword(null); // Do not return password
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Update failed: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/update-password")
+    public ResponseEntity<?> updatePassword(@RequestBody Map<String, String> passwords, @RequestParam("userId") int userId) {
+        String oldPassword = passwords.get("oldPassword");
+        String newPassword = passwords.get("newPassword");
+
+        try {
+            User updatedUser = userService.updatePassword(userId, oldPassword, newPassword);
+            updatedUser.setPassword(null); // Do not return password
+            return ResponseEntity.ok(updatedUser);
+        } catch (IllegalArgumentException e) {
+            // Return 401 if the old password is incorrect
+            return ResponseEntity.status(401).body("Incorrect old password.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Password update failed: " + e.getMessage());
+        }
+    }
 }

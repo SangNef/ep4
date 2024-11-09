@@ -13,9 +13,15 @@ import com.example.eproject4.service.ProvinceService;
 import com.example.eproject4.service.DistrictService;
 import com.example.eproject4.service.WardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 @RestController
@@ -50,10 +56,12 @@ public class OrderController {
 
     // Endpoint to get all orders
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        List<Order> orders = orderService.getAllOrders();
+    public ResponseEntity<Page<Order>> getAllOrders(@RequestParam(defaultValue = "0") int page, 
+                                                     @RequestParam(defaultValue = "10") int size) {
+        Page<Order> orders = orderService.getAllOrders(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
         return ResponseEntity.ok(orders);
     }
+    
 
     // Endpoint to get all provinces
     @GetMapping("/provinces")
@@ -108,8 +116,39 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Order>> getOrderByUserId(@PathVariable int userId) {
-        List<Order> orders = orderService.getOrderByUserId(userId);
-        return ResponseEntity.ok(orders);
+    public ResponseEntity<Map<String, Object>> getOrdersByUserId(
+            @PathVariable int userId,
+            @RequestParam(defaultValue = "0") int page, // Default page is 0
+            @RequestParam(defaultValue = "10") int size // Default size is 10
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+        Page<Order> orders = orderService.getOrderByUserId(userId, pageRequest);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("orders", orders.getContent());
+        response.put("totalPages", orders.getTotalPages());
+        response.put("totalElements", orders.getTotalElements());
+        response.put("currentPage", orders.getNumber());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/extend/{id}")
+    public ResponseEntity<Order> updateRentEnd(
+            @PathVariable int id,
+            @RequestBody Map<String, String> requestBody) {
+        String rentEndStr = requestBody.get("rentEnd");
+        String debtStr = requestBody.get("debt"); // Nhận giá trị debt từ request body
+
+        if (rentEndStr != null && debtStr != null) {
+            LocalDate rentEnd = LocalDate.parse(rentEndStr); // Chuyển đổi chuỗi thành LocalDate
+            int debt = Integer.parseInt(debtStr); // Chuyển đổi chuỗi thành int
+
+            Order updatedOrder = orderService.updateRentEnd(id, rentEnd, debt); // Cập nhật rentEnd và debt
+            if (updatedOrder != null) {
+                return ResponseEntity.ok(updatedOrder);
+            }
+        }
+        return ResponseEntity.notFound().build();
     }
 }

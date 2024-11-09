@@ -16,6 +16,8 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
     private String category;
+
+    @Column(columnDefinition = "DEFAULT 0")
     private Integer qty;
     private Boolean status;
     private Boolean canRent;
