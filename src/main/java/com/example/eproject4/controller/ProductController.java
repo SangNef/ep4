@@ -2,15 +2,15 @@ package com.example.eproject4.controller;
 
 import com.example.eproject4.model.Product;
 import com.example.eproject4.service.ProductService;
-
+import com.example.eproject4.repository.ProductRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/products")
@@ -21,8 +21,15 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
+    public ResponseEntity<List<Product>> getAllProducts(
+            @RequestParam(value = "name", required = false) String name) {
+
+        List<Product> products;
+        if (name != null && !name.isEmpty()) {
+            products = productService.getProductsByName(name);
+        } else {
+            products = productService.getAllProducts();
+        }
         return ResponseEntity.ok(products);
     }
 

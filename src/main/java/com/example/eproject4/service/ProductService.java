@@ -27,6 +27,10 @@ public class ProductService {
         return productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")); // Sort by createdDate in descending order
     }
 
+    public List<Product> getProductsByName(String name) {
+        return productRepository.findByNameContainingIgnoreCase(name, Sort.by(Sort.Direction.DESC, "id"));
+    }
+
     public List<Product> getAllActiveProducts() {
         return productRepository.findByStatus(true);
     }

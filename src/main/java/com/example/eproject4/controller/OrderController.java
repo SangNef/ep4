@@ -44,8 +44,11 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<Order> createOrder(@RequestBody Order order) {
         // Ensure that the order details are properly linked to the order
-        for (OrderDetail orderDetail : order.getOrderDetails()) {
-            orderDetail.setOrder(order); // Link the order detail to the order
+        if (order.getOrderDetails() != null) {
+            System.out.println("123123");
+            for (OrderDetail orderDetail : order.getOrderDetails()) {
+                orderDetail.setOrder(order); // Link the order detail to the order
+            }
         }
 
         // Create the order using the service
@@ -56,9 +59,15 @@ public class OrderController {
 
     // Endpoint to get all orders
     @GetMapping
-    public ResponseEntity<Page<Order>> getAllOrders(@RequestParam(defaultValue = "0") int page, 
-                                                     @RequestParam(defaultValue = "10") int size) {
-        Page<Order> orders = orderService.getAllOrders(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+    public ResponseEntity<Page<Order>> getAllOrders(@RequestParam(defaultValue = "0") int page,
+                                                     @RequestParam(defaultValue = "10") int size,
+                                                     @RequestParam(required = false) Integer status) {
+        Page<Order> orders;
+        if (status != null) {
+            orders = orderService.getOrdersByStatus(status, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+        } else {
+            orders = orderService.getAllOrders(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+        }
         return ResponseEntity.ok(orders);
     }
     

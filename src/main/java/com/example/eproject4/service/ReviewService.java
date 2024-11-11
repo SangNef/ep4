@@ -5,6 +5,10 @@ import com.example.eproject4.model.OrderDetail;
 import com.example.eproject4.model.Review;
 import com.example.eproject4.repository.OrderDetailRepository;
 import com.example.eproject4.repository.ReviewRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,5 +36,15 @@ public class ReviewService {
 
         // Return a new ReviewDTO with only the fields you want in the response
         return new ReviewDTO(review.getId(), review.getComment());
+    }
+
+    public List<ReviewDTO> getReviewsByProductId(int productId) {
+        // Get all reviews for the product by checking the associated order details
+        List<Review> reviews = reviewRepository.findByOrderDetail_Product_Id(productId);
+        
+        // Convert Review entities to ReviewDTOs
+        return reviews.stream()
+                .map(review -> new ReviewDTO(review.getId(), review.getComment()))
+                .collect(Collectors.toList());
     }
 }

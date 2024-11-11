@@ -12,4 +12,5 @@ import org.springframework.stereotype.Repository;
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
     // Additional query methods can be defined here if needed
     List<Review> findByOrderDetail_Product(Product product);
+    List<Review> findByOrderDetail_Product_Id(int productId);
 }

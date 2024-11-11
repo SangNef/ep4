@@ -3,8 +3,10 @@ package com.example.eproject4.service;
 import com.example.eproject4.model.Order;
 import com.example.eproject4.model.OrderDetail;
 import com.example.eproject4.model.Product;
+import com.example.eproject4.model.User;
 import com.example.eproject4.repository.OrderRepository;
 import com.example.eproject4.repository.ProductRepository;
+import com.example.eproject4.repository.UserRepository;
 
 import org.hibernate.engine.internal.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,28 +29,40 @@ public class OrderService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private UserRepository userRepository;
+
     public Order createOrder(Order order) {
-        // Save the order first
+
         Order savedOrder = orderRepository.save(order);
 
-        // Loop through each order detail to update the product quantity
         for (OrderDetail orderDetail : order.getOrderDetails()) {
-            // Load the latest Product data from the database
             Product product = productRepository.findById(orderDetail.getProduct().getId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-            // Ensure qty is not null before performing subtraction
-            Integer productQty = product.getQty() != null ? product.getQty() : 0;
-
-            // Calculate new quantity
-            int newQuantity = productQty - orderDetail.getQty();
+            int newQuantity = (product.getQty() != null ? product.getQty() : 0) - orderDetail.getQty();
             if (newQuantity < 0) {
                 throw new IllegalArgumentException("Insufficient quantity for product ID: " + product.getId());
             }
 
-            // Update and save the product quantity
             product.setQty(newQuantity);
             productRepository.save(product);
+        }
+
+        if (savedOrder.getUser() != null) {
+            User fullUser = userRepository.findById(savedOrder.getUser().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            savedOrder.setUser(fullUser);
+
+            String userEmail = fullUser.getEmail();
+            String subject = "Order Confirmation #" + savedOrder.getId();
+            String body = "Thank you for your order! Your order ID is " + savedOrder.getId();
+
+            emailService.sendEmail(userEmail, subject, body);
+            System.out.println("Order confirmation email sent to: " + userEmail);
         }
 
         return savedOrder;
@@ -57,6 +71,10 @@ public class OrderService {
     // Get a list of all orders
     public Page<Order> getAllOrders(Pageable pageable) {
         return orderRepository.findAll(pageable);
+    }
+
+    public Page<Order> getOrdersByStatus(Integer status, Pageable pageable) {
+        return orderRepository.findByStatus(status, pageable); // Implement this in the repository
     }
     
 

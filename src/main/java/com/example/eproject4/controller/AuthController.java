@@ -3,6 +3,7 @@ package com.example.eproject4.controller;
 import com.example.eproject4.model.User;
 import com.example.eproject4.service.UserService;
 
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -69,5 +70,13 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Password update failed: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        // Optionally, you can remove the password field for all users before returning the response
+        users.forEach(user -> user.setPassword(null));
+        return ResponseEntity.ok(users);
     }
 }
