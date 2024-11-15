@@ -1,5 +1,6 @@
 package com.example.eproject4.service;
 
+import com.example.eproject4.dto.OrderEmailDTO;
 import com.example.eproject4.model.Order;
 import com.example.eproject4.model.OrderDetail;
 import com.example.eproject4.model.Product;
@@ -56,16 +57,59 @@ public class OrderService {
             User fullUser = userRepository.findById(savedOrder.getUser().getId())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
             savedOrder.setUser(fullUser);
-
-            String userEmail = fullUser.getEmail();
-            String subject = "Order Confirmation #" + savedOrder.getId();
-            String body = "Thank you for your order! Your order ID is " + savedOrder.getId();
-
-            emailService.sendEmail(userEmail, subject, body);
-            System.out.println("Order confirmation email sent to: " + userEmail);
+    
+            OrderEmailDTO orderEmailDTO = buildOrderEmailDTO(savedOrder);
+            sendOrderConfirmationEmail(orderEmailDTO);
         }
 
         return savedOrder;
+    }
+
+    public OrderEmailDTO buildOrderEmailDTO(Order order) {
+        OrderEmailDTO dto = new OrderEmailDTO();
+        dto.setUserEmail(order.getUser().getEmail());
+        dto.setShippingAddress(order.getAddress() != null ? order.getAddress() : "No address provided");
+    
+        final double[] totalPrice = {0};
+        List<OrderEmailDTO.ProductInfo> productInfoList = order.getOrderDetails().stream().map(orderDetail -> {
+            OrderEmailDTO.ProductInfo productInfo = new OrderEmailDTO.ProductInfo();
+            Product product = orderDetail.getProduct();
+    
+            productInfo.setProductName(product.getName());
+            productInfo.setQuantity(orderDetail.getQty());
+            productInfo.setPrice(orderDetail.getPrice());
+    
+            totalPrice[0] += orderDetail.getPrice() * orderDetail.getQty();
+            return productInfo;
+        }).toList();
+    
+        dto.setProducts(productInfoList);
+        dto.setTotalPrice(totalPrice[0]);
+    
+        return dto;
+    }
+
+    private void sendOrderConfirmationEmail(OrderEmailDTO orderEmailDTO) {
+        String subject = "Order Confirmation #" + orderEmailDTO.getUserEmail();
+        StringBuilder body = new StringBuilder();
+        
+        body.append("Thank you for your order!\n\n")
+            .append("Shipping Address: ").append(orderEmailDTO.getShippingAddress()).append("\n\n")
+            .append("Order Details:\n");
+    
+        // Duyệt qua các sản phẩm trong đơn hàng
+        for (OrderEmailDTO.ProductInfo product : orderEmailDTO.getProducts()) {
+            body.append("- ").append(product.getProductName())
+                .append(", Quantity: ").append(product.getQuantity())
+                .append(", Price: $").append(product.getPrice());
+            body.append("\n");
+        }
+    
+        body.append("\nTotal Price: $").append(orderEmailDTO.getTotalPrice());
+    
+        // Gửi email
+        emailService.sendEmail(orderEmailDTO.getUserEmail(), subject, body.toString());
+        System.out.println("Order confirmation email sent to: " + orderEmailDTO.getUserEmail());
     }
 
     // Get a list of all orders
