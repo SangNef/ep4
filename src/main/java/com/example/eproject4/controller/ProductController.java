@@ -22,14 +22,17 @@ public class ProductController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Product>> getAllProducts(
-            @RequestParam(value = "name", required = false) String name) {
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Boolean status) {
 
-        List<Product> products;
-        if (name != null && !name.isEmpty()) {
-            products = productService.getProductsByName(name);
-        } else {
-            products = productService.getAllProducts();
-        }
+        // Chuyển chuỗi rỗng thành null để bỏ qua
+        name = (name != null && name.isEmpty()) ? null : name;
+        category = (category != null && category.isEmpty()) ? null : category;
+
+        List<Product> products = productService.getFilteredProducts(minPrice, maxPrice, name, category, status);
         return ResponseEntity.ok(products);
     }
 
@@ -91,27 +94,39 @@ public class ProductController {
     }
 
     @GetMapping("/category/fruit-tree")
-    public ResponseEntity<List<Product>> getFruitTrees() {
-        return ResponseEntity.ok(productService.getFruitTrees());
+    public ResponseEntity<List<Product>> getFruitTrees(
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false, defaultValue = "asc") String sortOrder) {
+        return ResponseEntity.ok(productService.getFruitTrees(maxPrice, sortOrder));
     }
 
     @GetMapping("/category/flowering-tree")
-    public ResponseEntity<List<Product>> getFloweringTrees() {
-        return ResponseEntity.ok(productService.getFloweringTrees());
+    public ResponseEntity<List<Product>> getFloweringTrees(
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false, defaultValue = "asc") String sortOrder) {
+        return ResponseEntity.ok(productService.getFloweringTrees(maxPrice, sortOrder));
     }
 
     @GetMapping("/category/shade-tree")
-    public ResponseEntity<List<Product>> getShadeTrees() {
-        return ResponseEntity.ok(productService.getShadeTrees());
+    public ResponseEntity<List<Product>> getShadeTrees(
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false, defaultValue = "asc") String sortOrder) {
+        return ResponseEntity.ok(productService.getShadeTrees(maxPrice, sortOrder));
     }
 
     @GetMapping("/category/ornamental-tree")
-    public ResponseEntity<List<Product>> getOrnamentalTrees() {
-        return ResponseEntity.ok(productService.getOrnamentalTrees());
+    public ResponseEntity<List<Product>> getOrnamentalTrees(
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false, defaultValue = "asc") String sortOrder) {
+        return ResponseEntity.ok(productService.getOrnamentalTrees(
+                maxPrice, sortOrder));
     }
 
     @GetMapping("/category/evergreen-tree")
-    public ResponseEntity<List<Product>> getEvergreenTrees() {
-        return ResponseEntity.ok(productService.getEvergreenTrees());
+    public ResponseEntity<List<Product>> getEvergreenTrees(
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false, defaultValue = "asc") String sortOrder) {
+        return ResponseEntity.ok(productService.getEvergreenTrees(
+                maxPrice, sortOrder));
     }
 }

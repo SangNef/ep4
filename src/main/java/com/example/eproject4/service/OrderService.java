@@ -74,23 +74,35 @@ public class OrderService {
     }
 
     public Page<Order> getOrdersByStatus(Integer status, Pageable pageable) {
-        return orderRepository.findByStatus(status, pageable); // Implement this in the repository
+        return orderRepository.findByStatus(status, pageable);
+    }
+
+    public Page<Order> getOrdersByStatusAndType(Integer status, Order.OrderType type, Pageable pageable) {
+        return orderRepository.findByStatusAndType(status, type, pageable);  // Pass the enum directly
+    }
+
+    public Page<Order> getOrdersByType(Order.OrderType type, Pageable pageable) {
+        return orderRepository.findByType(type, pageable);  // Pass the enum directly
     }
     
-
     // Get an order by ID
     public Order getOrderById(int id) {
         return orderRepository.findById(id).orElse(null);
     }
 
     public Order updateOrderStatus(int id) {
-        Order order = orderRepository.findById(id).orElse(null);
-        if (order != null && order.getStatus() < 4) { // Giả sử status tối đa là 4
-            order.setStatus(order.getStatus() + 1);
-            return orderRepository.save(order);
-        }
-        return null;
-    }
+        return orderRepository.findById(id).map(order -> {
+            int currentStatus = order.getStatus();
+            
+            // Check if status is within the allowed range to be updated
+            if ((currentStatus >= 0 && currentStatus < 4) || (currentStatus > 5 && currentStatus < 12)) {
+                order.setStatus(currentStatus + 1);
+                return orderRepository.save(order);
+            }
+            
+            return order; // Returning unchanged order if status update is not allowed
+        }).orElse(null);
+    }    
 
     public Order cancelOrder(int id) {
         Order order = orderRepository.findById(id).orElse(null);

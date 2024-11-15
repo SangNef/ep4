@@ -14,6 +14,7 @@ import com.example.eproject4.service.DistrictService;
 import com.example.eproject4.service.WardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -60,17 +61,37 @@ public class OrderController {
     // Endpoint to get all orders
     @GetMapping
     public ResponseEntity<Page<Order>> getAllOrders(@RequestParam(defaultValue = "0") int page,
-                                                     @RequestParam(defaultValue = "10") int size,
-                                                     @RequestParam(required = false) Integer status) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Integer status,
+            @RequestParam(required = false) String type) {
         Page<Order> orders;
-        if (status != null) {
-            orders = orderService.getOrdersByStatus(status, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        // Handle both status and type filters
+        if (status != null && type != null) {
+            Order.OrderType orderType = parseOrderType(type); // Convert string type to enum
+            orders = orderService.getOrdersByStatusAndType(status, orderType, pageable);
+        } else if (status != null) {
+            orders = orderService.getOrdersByStatus(status, pageable);
+        } else if (type != null) {
+            Order.OrderType orderType = parseOrderType(type); // Convert string type to enum
+            orders = orderService.getOrdersByType(orderType, pageable);
         } else {
-            orders = orderService.getAllOrders(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+            orders = orderService.getAllOrders(pageable);
         }
+
         return ResponseEntity.ok(orders);
     }
-    
+
+    // Helper method to parse the type string to OrderType enum
+    private Order.OrderType parseOrderType(String type) {
+        try {
+            return Order.OrderType.valueOf(type.toUpperCase()); // Ensure to convert string to uppercase to match enum
+                                                                // names
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid order type: " + type); // Handle invalid enum type
+        }
+    }
 
     // Endpoint to get all provinces
     @GetMapping("/provinces")

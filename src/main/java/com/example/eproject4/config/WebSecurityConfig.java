@@ -23,7 +23,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         http
                 .csrf().disable() // Disable CSRF
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/api/auth/**", "/api/products/**", "/api/orders/**", "/api/reviews/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/products/**", "/api/orders/**", "/api/reviews/**", "/api/dashboard/**").permitAll()
                         .anyRequest().authenticated());
 
         return http.build(); // Thêm dấu chấm phẩy

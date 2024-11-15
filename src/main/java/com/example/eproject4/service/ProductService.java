@@ -39,6 +39,10 @@ public class ProductService {
         return productRepository.findById(id).orElse(null);
     }
 
+    public List<Product> getFilteredProducts(Double minPrice, Double maxPrice, String name, String category, Boolean status) {
+        return productRepository.findByFilters(minPrice, maxPrice, name, category, status);
+    }    
+
     @Transactional
     public Product updateProduct(int id, Product updatedProduct) {
         Product existingProduct = productRepository.findById(id)
@@ -86,28 +90,36 @@ public class ProductService {
                 .toList();
     }
 
-    public List<Product> getProductsByCategory(String category) {
-        return productRepository.findByCategoryAndStatus(category, true);
+    public List<Product> getProductsByCategory(String category, Double maxPrice, String sortOrder) {
+        Sort sort = Sort.by("price");
+        if ("desc".equalsIgnoreCase(sortOrder)) {
+            sort = sort.descending();
+        } else {
+            sort = sort.ascending();
+        }
+    
+        return productRepository.findByCategoryAndMaxPrice(category, maxPrice, sort);
     }
 
-    public List<Product> getFruitTrees() {
-        return getProductsByCategory("Fruit Tree");
+    public List<Product> getFruitTrees(Double maxPrice, String sortOrder) {
+        return getProductsByCategory("Fruit Tree", maxPrice, sortOrder);
+    }
+    
+    public List<Product> getFloweringTrees(Double maxPrice, String sortOrder) {
+        return getProductsByCategory("Flowering Tree", maxPrice, sortOrder);
+    }
+    
+
+    public List<Product> getShadeTrees(Double maxPrice, String sortOrder) {
+        return getProductsByCategory("Shade Tree", maxPrice, sortOrder);
     }
 
-    public List<Product> getFloweringTrees() {
-        return getProductsByCategory("Flowering Tree");
+    public List<Product> getOrnamentalTrees(Double maxPrice, String sortOrder) {
+        return getProductsByCategory("Ornamental Tree", maxPrice, sortOrder);
     }
 
-    public List<Product> getShadeTrees() {
-        return getProductsByCategory("Shade Tree");
-    }
-
-    public List<Product> getOrnamentalTrees() {
-        return getProductsByCategory("Ornamental Tree");
-    }
-
-    public List<Product> getEvergreenTrees() {
-        return getProductsByCategory("Evergreen Tree");
+    public List<Product> getEvergreenTrees(Double maxPrice, String sortOrder) {
+        return getProductsByCategory("Evergreen Tree", maxPrice, sortOrder);
     }
 
     public ProductDTO convertToDTO(Product product) {
