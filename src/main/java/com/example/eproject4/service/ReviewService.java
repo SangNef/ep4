@@ -23,7 +23,7 @@ public class ReviewService {
     private OrderDetailRepository orderDetailRepository;
 
     @Transactional
-    public ReviewDTO addReview(int orderDetailId, String comment) {
+    public ReviewDTO addReview(int orderDetailId, String comment, int rate) {
         // Find the order detail by ID
         OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
                 .orElseThrow(() -> new RuntimeException("OrderDetail not found"));
@@ -32,6 +32,7 @@ public class ReviewService {
         Review review = new Review();
         review.setOrderDetail(orderDetail);
         review.setComment(comment);
+        review.setRate(rate);
         reviewRepository.save(review);
 
         // Return a new ReviewDTO with only the fields you want in the response

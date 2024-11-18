@@ -18,6 +18,9 @@ public class Review {
 
     private String comment;
 
+    // rate
+    private int rate;
+
     // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -27,4 +30,7 @@ public class Review {
 
     public String getComment() { return comment; }
     public void setComment(String comment) { this.comment = comment; }
+
+    public int getRate() { return rate; }
+    public void setRate(int rate) { this.rate = rate; }
 }

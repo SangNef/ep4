@@ -54,6 +54,10 @@ public class Order {
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private int debt = 0;
 
+    // add column return_by: string 10, nullable
+    @Column(name = "return_by", nullable = true, length = 10)
+    private String returnBy;
+
     public Order() {
     }
 
@@ -178,5 +182,13 @@ public class Order {
     public enum OrderType {
         BUY,
         RENT
+    }
+
+    public String getReturnBy() {
+        return returnBy;
+    }
+
+    public void setReturnBy(String returnBy) {
+        this.returnBy = returnBy;
     }
 }

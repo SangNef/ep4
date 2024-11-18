@@ -22,7 +22,7 @@ public class ReviewController {
             @PathVariable int orderDetailId,
             @RequestBody ReviewDTO reviewDTO) {
 
-        ReviewDTO createdReview = reviewService.addReview(orderDetailId, reviewDTO.getComment());
+        ReviewDTO createdReview = reviewService.addReview(orderDetailId, reviewDTO.getComment(), reviewDTO.getRate());
         return ResponseEntity.ok(createdReview);
     }
 
