@@ -1,5 +1,6 @@
 package com.example.eproject4.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class OrderEmailDTO {
@@ -8,10 +9,30 @@ public class OrderEmailDTO {
     private List<ProductInfo> products;
     private double totalPrice;
 
+    // Các trường mới cho thông tin thuê
+    private LocalDate rentStart;
+    private LocalDate rentEnd;
+
+    public LocalDate getRentStart() {
+        return rentStart;
+    }
+
+    public void setRentStart(LocalDate rentStart) {
+        this.rentStart = rentStart;
+    }
+
+    public LocalDate getRentEnd() {
+        return rentEnd;
+    }
+
+    public void setRentEnd(LocalDate rentEnd) {
+        this.rentEnd = rentEnd;
+    }
+
     public OrderEmailDTO() {
     }
 
-    public OrderEmailDTO(String userEmail, String shippingAddress, List<ProductInfo> products, double totalPrice) {
+    public OrderEmailDTO(String userEmail, String shippingAddress, List<ProductInfo> products, double totalPrice, String rentStart, String rentEnd) {
         this.userEmail = userEmail;
         this.shippingAddress = shippingAddress;
         this.products = products;

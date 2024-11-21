@@ -65,8 +65,12 @@ public class OrderService {
             User fullUser = userRepository.findById(savedOrder.getUser().getId())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
             savedOrder.setUser(fullUser);
-
+    
             OrderEmailDTO orderEmailDTO = buildOrderEmailDTO(savedOrder);
+            if (savedOrder.getType() == Order.OrderType.RENT) {
+                orderEmailDTO.setRentStart(savedOrder.getRentStart());
+                orderEmailDTO.setRentEnd(savedOrder.getRentEnd());
+            }
             sendOrderConfirmationEmail(orderEmailDTO);
         }
 
@@ -94,6 +98,12 @@ public class OrderService {
         dto.setProducts(productInfoList);
         dto.setTotalPrice(totalPrice[0]);
 
+        // Kiểm tra nếu Order là loại RENT, thêm thông tin rentStart và rentEnd
+        if (order.getType() == Order.OrderType.RENT) {
+            dto.setRentStart(order.getRentStart());
+            dto.setRentEnd(order.getRentEnd());
+        }
+
         return dto;
     }
 
@@ -104,7 +114,6 @@ public class OrderService {
         body.append("Thank you for your order!\n\n")
                 .append("Shipping Address: ").append(orderEmailDTO.getShippingAddress()).append("\n\n")
                 .append("Order Details:\n");
-
         // Duyệt qua các sản phẩm trong đơn hàng
         for (OrderEmailDTO.ProductInfo product : orderEmailDTO.getProducts()) {
             body.append("- ").append(product.getProductName())
@@ -112,7 +121,11 @@ public class OrderService {
                     .append(", Price: $").append(product.getPrice());
             body.append("\n");
         }
-
+        if (orderEmailDTO.getRentStart() != null && orderEmailDTO.getRentEnd() != null) {
+            body.append("\n\nRental Period:\n")
+                .append("Rent Start: ").append(orderEmailDTO.getRentStart()).append("\n")
+                .append("Rent End: ").append(orderEmailDTO.getRentEnd()).append("\n");
+        }
         body.append("\nTotal Price: $").append(orderEmailDTO.getTotalPrice());
 
         // Gửi email
@@ -183,4 +196,24 @@ public class OrderService {
         }
         return null;
     }
+
+    public Order refundOrder(int id, int refundAmount) {
+        return orderRepository.findById(id).map(order -> {
+            // Ensure the order can be refunded (e.g., it must not already be refunded)
+            if (order.getStatus() != 11) {
+                int newPrice = order.getPrice() - refundAmount;
+    
+                // Ensure the new price is not negative
+                if (newPrice < 0) {
+                    throw new IllegalArgumentException("Refund amount exceeds the order price.");
+                }
+    
+                order.setPrice(newPrice);
+                order.setStatus(11); // Update status to 'Refunded'
+                return orderRepository.save(order);
+            } else {
+                throw new IllegalStateException("Order is already refunded.");
+            }
+        }).orElse(null);
+    }    
 }
