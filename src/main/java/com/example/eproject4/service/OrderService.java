@@ -182,15 +182,18 @@ public class OrderService {
         return orderRepository.findByUserId(userId, pageRequest);
     }
 
-    public Order updateRentEnd(int orderId, LocalDate rentEnd, int debt) {
+    public Order updateRentEnd(int orderId, LocalDate rentEnd, int deposit) {
         Order order = orderRepository.findById(orderId).orElse(null);
         if (order != null) {
             // Cập nhật ngày kết thúc thuê
             order.setRentEnd(rentEnd);
 
             // Cập nhật debt: cộng thêm giá trị debt từ request vào debt cũ
-            int newDebt = order.getDebt() + debt;
-            order.setDebt(newDebt); // Cập nhật giá trị debt mới
+            // int newDebt = order.getDebt() + debt;
+            // order.setDebt(newDebt); // Cập nhật giá trị debt mới
+
+            int newDeposit = order.getDeposit() - deposit;
+            order.setDeposit(newDeposit);
 
             return orderRepository.save(order); // Lưu thay đổi vào cơ sở dữ liệu
         }

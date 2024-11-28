@@ -51,6 +51,8 @@ public class Order {
 
     private int price; // Added price field
 
+    private int deposit; // Added deposit field
+
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private int debt = 0;
 
@@ -165,6 +167,14 @@ public class Order {
     public void setPrice(int price) {
         this.price = price;
     } // Setter for price
+
+    public int getDeposit() {
+        return deposit;
+    } // Getter for deposit
+
+    public void setDeposit(int deposit) {
+        this.deposit = deposit;
+    } // Setter for deposit
 
     public int getDebt() {
         return debt;

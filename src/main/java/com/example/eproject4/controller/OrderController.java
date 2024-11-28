@@ -172,13 +172,13 @@ public class OrderController {
             @PathVariable int id,
             @RequestBody Map<String, String> requestBody) {
         String rentEndStr = requestBody.get("rentEnd");
-        String debtStr = requestBody.get("debt"); // Nhận giá trị debt từ request body
+        String depositStr = requestBody.get("deposit"); // Nhận giá trị debt từ request body
 
-        if (rentEndStr != null && debtStr != null) {
+        if (rentEndStr != null && depositStr != null) {
             LocalDate rentEnd = LocalDate.parse(rentEndStr); // Chuyển đổi chuỗi thành LocalDate
-            int debt = Integer.parseInt(debtStr); // Chuyển đổi chuỗi thành int
+            int deposit = Integer.parseInt(depositStr); // Chuyển đổi chuỗi thành int
 
-            Order updatedOrder = orderService.updateRentEnd(id, rentEnd, debt); // Cập nhật rentEnd và debt
+            Order updatedOrder = orderService.updateRentEnd(id, rentEnd, deposit); // Cập nhật rentEnd và debt
             if (updatedOrder != null) {
                 return ResponseEntity.ok(updatedOrder);
             }
