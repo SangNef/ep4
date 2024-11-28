@@ -42,25 +42,25 @@ public class OrderService {
 
     public Order createOrder(Order order) {
         Order savedOrder = orderRepository.save(order);
-
+    
         for (OrderDetail orderDetail : order.getOrderDetails()) {
             orderDetail.setOrder(savedOrder);
-
+    
             Product product = productRepository.findById(orderDetail.getProduct().getId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-
+    
             int newQuantity = (product.getQty() != null ? product.getQty() : 0) - orderDetail.getQty();
             if (newQuantity < 0) {
                 throw new IllegalArgumentException("Insufficient quantity for product ID: " + product.getId());
             }
-
+    
             product.setQty(newQuantity);
             productRepository.save(product);
-
+    
             orderDetail.setProduct(product);
             orderDetailRepository.save(orderDetail);
         }
-
+    
         if (savedOrder.getUser() != null) {
             User fullUser = userRepository.findById(savedOrder.getUser().getId())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -73,66 +73,122 @@ public class OrderService {
             }
             sendOrderConfirmationEmail(orderEmailDTO);
         }
-
+    
         return savedOrder;
     }
-
+    
     public OrderEmailDTO buildOrderEmailDTO(Order order) {
         OrderEmailDTO dto = new OrderEmailDTO();
         dto.setUserEmail(order.getUser().getEmail());
+        dto.setUsername(order.getUser().getUsername());
+        dto.setFullname(order.getUser().getFullname());
         dto.setShippingAddress(order.getAddress() != null ? order.getAddress() : "No address provided");
-
+    
         final double[] totalPrice = { 0 };
         List<OrderEmailDTO.ProductInfo> productInfoList = order.getOrderDetails().stream().map(orderDetail -> {
             OrderEmailDTO.ProductInfo productInfo = new OrderEmailDTO.ProductInfo();
             Product product = orderDetail.getProduct();
-
+    
             productInfo.setProductName(product.getName());
             productInfo.setQuantity(orderDetail.getQty());
             productInfo.setPrice(orderDetail.getPrice());
-
+    
             totalPrice[0] += orderDetail.getPrice() * orderDetail.getQty();
             return productInfo;
         }).toList();
-
+    
         dto.setProducts(productInfoList);
         dto.setTotalPrice(totalPrice[0]);
-
+    
         // Kiểm tra nếu Order là loại RENT, thêm thông tin rentStart và rentEnd
         if (order.getType() == Order.OrderType.RENT) {
             dto.setRentStart(order.getRentStart());
             dto.setRentEnd(order.getRentEnd());
         }
-
+    
         return dto;
     }
-
+    
     private void sendOrderConfirmationEmail(OrderEmailDTO orderEmailDTO) {
         String subject = "Order Confirmation #" + orderEmailDTO.getUserEmail();
+    
+        // Tạo nội dung HTML
         StringBuilder body = new StringBuilder();
-
-        body.append("Thank you for your order!\n\n")
-                .append("Shipping Address: ").append(orderEmailDTO.getShippingAddress()).append("\n\n")
-                .append("Order Details:\n");
-        // Duyệt qua các sản phẩm trong đơn hàng
+        body.append("<html>")
+            .append("<head>")
+            .append("<style>")
+            .append("@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');")
+            .append("body { font-family: 'Roboto', Arial, sans-serif; text-align: center; margin: 0; padding: 20px; }")
+            .append(".container { width: 100%; max-width: 300px; margin: 0 auto; background-color: #f9f9f9; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }")
+            .append(".header { color: #007b00; font-size: 50px; font-weight: bold; margin-bottom: 5px; text-align: center; }")
+            .append(".subheader { font-size: 14px; color: #555; margin-bottom: 20px;text-align: center;font-weight: bold; }")
+            .append("table { width: 100%; border-collapse: collapse; margin: 20px 0; }")
+            .append("th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }")
+            .append("th { background-color: #007b00; color: white; }")
+            .append(".section-title { font-size: 18px; margin: 20px 0 10px; font-weight: bold; }")
+            .append("p { margin: 5px 0; }")
+            .append("strong { font-weight: bold; }")
+            .append("h3 { text-align: center;padding-top:5px;font-size: 30px }")
+            .append("</style>")
+            .append("</head>")
+            .append("<body>")
+            .append("<div class='container'>")
+            .append("<div class='header'>Plant Store</div>")
+            .append("<div class='subheader'>Grow your world with our plants!</div>")
+            .append("<h3>Thank you for your order !</h3>");
+    
+        // Bảng chứa thông tin sản phẩm
+        body.append("<div class='section-title'>Order Details</div>")
+            .append("<table>")
+            .append("<thead>")
+            .append("<tr>")
+            .append("<th>Product Name</th>")
+            .append("<th>Quantity</th>")
+            .append("<th>Price</th>")
+            .append("</tr>")
+            .append("</thead>")
+            .append("<tbody>");
+        
         for (OrderEmailDTO.ProductInfo product : orderEmailDTO.getProducts()) {
-            body.append("- ").append(product.getProductName())
-                    .append(", Quantity: ").append(product.getQuantity())
-                    .append(", Price: $").append(product.getPrice());
-            body.append("\n");
+            body.append("<tr>")
+                .append("<td>").append(product.getProductName()).append("</td>")
+                .append("<td>").append(product.getQuantity()).append("</td>")
+                .append("<td>$").append(String.format("%.2f", product.getPrice())).append("</td>")
+                .append("</tr>");
         }
+        body.append("</tbody>")
+            .append("</table>")
+            .append("<p><strong>Total Price: $").append(String.format("%.2f", orderEmailDTO.getTotalPrice())).append("</strong></p>");
+    
+        // Thêm thông tin ngày thuê
         if (orderEmailDTO.getRentStart() != null && orderEmailDTO.getRentEnd() != null) {
-            body.append("\n\nRental Period:\n")
-                .append("Rent Start: ").append(orderEmailDTO.getRentStart()).append("\n")
-                .append("Rent End: ").append(orderEmailDTO.getRentEnd()).append("\n");
+            body.append("<div class='section-title'>Rental Period</div>")
+                .append("<p>Rent Start: ").append(orderEmailDTO.getRentStart()).append("</p>")
+                .append("<p>Rent End: ").append(orderEmailDTO.getRentEnd()).append("</p>");
         }
-        body.append("\nTotal Price: $").append(orderEmailDTO.getTotalPrice());
+    
+        // Thông tin khách hàng
+        body.append("<div class='section-title'>Customer Details</div>")
+            .append("<p>Email: ").append(orderEmailDTO.getUserEmail()).append("</p>")
+            .append("<p>Username: ").append(orderEmailDTO.getUsername()).append("</p>")
+            .append("<p>Full Name: ").append(orderEmailDTO.getFullname()).append("</p>")
+            .append("<p>Shipping Address: ").append(orderEmailDTO.getShippingAddress()).append("</p>")
+            .append("<footer style='margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #555; text-align: center;'>")
+            .append("If you have any questions, feel free to <a href='mailto:support@plantstore.com'>Plan Store</a>.")
+            .append("<br>Plant Store &copy; 2024. All Rights Reserved.")
+            .append("<br>8A Ton That Thuyet, My Dinh,Ha Noi , Viet Nam")
+            .append("</footer>")
+            .append("</div>")
+            .append("</body>")
+            .append("</html>");
 
+        
+            
         // Gửi email
-        emailService.sendEmail(orderEmailDTO.getUserEmail(), subject, body.toString());
+        emailService.sendEmail(orderEmailDTO.getUserEmail(), subject, body.toString(), true);
         System.out.println("Order confirmation email sent to: " + orderEmailDTO.getUserEmail());
     }
-
+ 
     // Get a list of all orders
     public Page<Order> getAllOrders(Pageable pageable) {
         return orderRepository.findAll(pageable);

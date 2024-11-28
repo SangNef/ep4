@@ -188,27 +188,32 @@ public class OrderController {
 
     @PutMapping("/refund/{id}")
     public ResponseEntity<Order> refundOrder(@PathVariable int id, @RequestBody Map<String, Integer> requestBody) {
-        Integer refundAmount = requestBody.get("refundAmount"); // Số tiền refund từ request
-    
-        if (refundAmount == null || refundAmount < 0) {
-            return ResponseEntity.badRequest().body(null); // Trả lỗi nếu không có refundAmount hoặc không hợp lệ
+        Integer refundPercentage = requestBody.get("refundAmount"); // Phần trăm refund từ request
+
+        if (refundPercentage == null || refundPercentage < 0 || refundPercentage > 100) {
+            return ResponseEntity.badRequest().body(null); // Trả lỗi nếu phần trăm không hợp lệ
         }
-    
+
         Order order = orderService.getOrderById(id);
         if (order == null) {
             return ResponseEntity.notFound().build(); // Trả lỗi nếu không tìm thấy order
         }
 
-        int newPrice = order.getDeposit() - refundAmount;
+        int deposit = order.getDeposit(); // Lấy giá trị deposit ban đầu
+        int refundAmount = (deposit * refundPercentage) / 100; // Tính số tiền refund dựa trên phần trăm
+
+        int newPrice = deposit - refundAmount; // Giá trị mới sau khi hoàn trả
         if (newPrice < 0) {
-            return ResponseEntity.badRequest().body(null); // Trả lỗi nếu price âm
+            return ResponseEntity.badRequest().body(null); // Trả lỗi nếu giá trị âm
         }
 
         // Cập nhật các thông tin của order
-        order.setDeposit(newPrice + order.getDebt()); // price = price + debt
-        order.setDebt(0);                          // debt = 0
-        order.setStatus(11);                       // status = 11
+        order.setDeposit(newPrice + order.getDebt()); // Cập nhật deposit: thêm debt vào
+        order.setDebt(0); // Đặt debt về 0
+        order.setStatus(11); // Cập nhật trạng thái về 11
+
         Order updatedOrder = orderRepository.save(order);
         return ResponseEntity.ok(updatedOrder);
     }
+
 }

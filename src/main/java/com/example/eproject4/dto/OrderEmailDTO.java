@@ -9,6 +9,8 @@ public class OrderEmailDTO {
     private List<ProductInfo> products;
     private double totalPrice;
 
+    private String username;
+    private String fullname;
     // Các trường mới cho thông tin thuê
     private LocalDate rentStart;
     private LocalDate rentEnd;
@@ -32,13 +34,33 @@ public class OrderEmailDTO {
     public OrderEmailDTO() {
     }
 
-    public OrderEmailDTO(String userEmail, String shippingAddress, List<ProductInfo> products, double totalPrice, String rentStart, String rentEnd) {
+    public OrderEmailDTO(String userEmail, String shippingAddress, List<ProductInfo> products, double totalPrice,
+    String username, String fullname, LocalDate rentStart, LocalDate rentEnd) {
         this.userEmail = userEmail;
         this.shippingAddress = shippingAddress;
         this.products = products;
         this.totalPrice = totalPrice;
+        this.username = username;
+        this.fullname = fullname;
+        this.rentStart = rentStart;
+        this.rentEnd = rentEnd;
+        }
+
+    public String getUsername() {
+        return username;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
     public String getUserEmail() {
         return userEmail;
     }
