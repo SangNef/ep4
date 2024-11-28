@@ -204,14 +204,14 @@ public class OrderService {
         return orderRepository.findById(id).map(order -> {
             // Ensure the order can be refunded (e.g., it must not already be refunded)
             if (order.getStatus() != 11) {
-                int newPrice = order.getPrice() - refundAmount;
+                int newPrice = order.getDeposit() - refundAmount;
     
                 // Ensure the new price is not negative
                 if (newPrice < 0) {
                     throw new IllegalArgumentException("Refund amount exceeds the order price.");
                 }
     
-                order.setPrice(newPrice);
+                order.setDeposit(newPrice);
                 order.setStatus(11); // Update status to 'Refunded'
                 return orderRepository.save(order);
             } else {

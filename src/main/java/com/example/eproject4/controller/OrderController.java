@@ -199,13 +199,13 @@ public class OrderController {
             return ResponseEntity.notFound().build(); // Trả lỗi nếu không tìm thấy order
         }
 
-        int newPrice = order.getPrice() - refundAmount;
+        int newPrice = order.getDeposit() - refundAmount;
         if (newPrice < 0) {
             return ResponseEntity.badRequest().body(null); // Trả lỗi nếu price âm
         }
 
         // Cập nhật các thông tin của order
-        order.setPrice(newPrice + order.getDebt()); // price = price + debt
+        order.setDeposit(newPrice + order.getDebt()); // price = price + debt
         order.setDebt(0);                          // debt = 0
         order.setStatus(11);                       // status = 11
         Order updatedOrder = orderRepository.save(order);
