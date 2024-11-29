@@ -3,6 +3,7 @@ package com.example.eproject4.controller;
 import com.example.eproject4.model.Order;
 import com.example.eproject4.model.OrderDetail;
 import com.example.eproject4.model.Province;
+import com.example.eproject4.model.RefundImage;
 import com.example.eproject4.dto.DistrictDTO;
 import com.example.eproject4.dto.ProvinceDTO;
 import com.example.eproject4.dto.WardDTO;
@@ -10,6 +11,7 @@ import com.example.eproject4.model.District;
 import com.example.eproject4.model.Ward;
 import com.example.eproject4.service.OrderService;
 import com.example.eproject4.repository.OrderRepository;
+import com.example.eproject4.repository.RefundImageRepository;
 import com.example.eproject4.service.ProvinceService;
 import com.example.eproject4.service.DistrictService;
 import com.example.eproject4.service.WardService;
@@ -43,6 +45,9 @@ public class OrderController {
     private WardService wardService;
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private RefundImageRepository refundImageRepository;
 
     // Endpoint to create a new order
     // Endpoint to create a new order
@@ -187,32 +192,49 @@ public class OrderController {
     }
 
     @PutMapping("/refund/{id}")
-    public ResponseEntity<Order> refundOrder(@PathVariable int id, @RequestBody Map<String, Integer> requestBody) {
-        Integer refundPercentage = requestBody.get("refundAmount"); // Phần trăm refund từ request
+    public ResponseEntity<Order> refundOrder(@PathVariable int id, @RequestBody Map<String, Object> requestBody) {
+        Integer refundPercentage = (Integer) requestBody.get("refundAmount");
+        List<String> refundImageUrls = (List<String>) requestBody.get("refundImageUrls");
 
-        if (refundPercentage == null || refundPercentage < 0 || refundPercentage > 100) {
-            return ResponseEntity.badRequest().body(null); // Trả lỗi nếu phần trăm không hợp lệ
+        // Kiểm tra dữ liệu đầu vào
+        if (refundPercentage == null || refundPercentage < 0 || refundPercentage > 100 || refundImageUrls == null
+                || refundImageUrls.isEmpty()) {
+            return ResponseEntity.badRequest().body(null); // Trả lỗi nếu dữ liệu không hợp lệ
         }
 
+        // Tìm order theo ID
         Order order = orderService.getOrderById(id);
         if (order == null) {
             return ResponseEntity.notFound().build(); // Trả lỗi nếu không tìm thấy order
         }
 
-        int deposit = order.getDeposit(); // Lấy giá trị deposit ban đầu
-        int refundAmount = (deposit * refundPercentage) / 100; // Tính số tiền refund dựa trên phần trăm
+        // Tính toán số tiền refund
+        int deposit = order.getDeposit();
+        int refundAmount = (deposit * refundPercentage) / 100;
 
-        int newPrice = deposit - refundAmount; // Giá trị mới sau khi hoàn trả
+        // Kiểm tra giá trị mới
+        int newPrice = deposit - refundAmount;
         if (newPrice < 0) {
             return ResponseEntity.badRequest().body(null); // Trả lỗi nếu giá trị âm
         }
 
-        // Cập nhật các thông tin của order
-        order.setDeposit(newPrice + order.getDebt()); // Cập nhật deposit: thêm debt vào
-        order.setDebt(0); // Đặt debt về 0
-        order.setStatus(11); // Cập nhật trạng thái về 11
+        // Cập nhật thông tin của order
+        order.setDeposit(newPrice);
+        order.setPrice(order.getPrice() + newPrice + order.getDebt());
+        order.setDebt(0);
+        order.setStatus(11); // Đặt trạng thái là 'Refunded'
 
+        // Lưu các ảnh hoàn trả vào bảng RefundImages
+        for (String imageUrl : refundImageUrls) {
+            RefundImage refundImage = new RefundImage();
+            refundImage.setOrder(order);
+            refundImage.setImageUrl(imageUrl);
+            refundImageRepository.save(refundImage);
+        }
+
+        // Lưu order
         Order updatedOrder = orderRepository.save(order);
+
         return ResponseEntity.ok(updatedOrder);
     }
 

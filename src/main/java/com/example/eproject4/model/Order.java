@@ -37,6 +37,17 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderDetail> orderDetails; // One-to-many relationship with OrderDetail
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RefundImage> refundImages;
+
+    public List<RefundImage> getRefundImages() {
+        return refundImages;
+    }
+
+    public void setRefundImages(List<RefundImage> refundImages) {
+        this.refundImages = refundImages;
+    }
+
     @Enumerated(EnumType.STRING)
     private Payment payment;
 
@@ -179,7 +190,7 @@ public class Order {
     public int getDebt() {
         return debt;
     }
-    
+
     public void setDebt(int debt) {
         this.debt = debt;
     }
